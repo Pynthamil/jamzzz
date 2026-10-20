@@ -17,8 +17,12 @@ import { fonts } from '../theme/typography';
 import { ChatInputBox } from '../components/ChatInputBox';
 import { PromptChip, PromptChipItem } from '../components/PromptChip';
 import { LuminousButton } from '../components/LuminousButton';
-import { RetroUserBubble } from '../components/RetroUserBubble';
 import { SidebarDrawer } from '../components/SidebarDrawer';
+import {
+  generateGeminiResponse,
+  ActionCta,
+  ChatHistoryMessage,
+} from '../services/gemini';
 
 const PROMPT_CHIPS: PromptChipItem[] = [
   {
@@ -58,103 +62,8 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   text: string;
   isStreaming?: boolean;
-  actionCta?: {
-    title: string;
-    icon?: keyof typeof Feather.glyphMap;
-    prompt: string;
-  };
+  actionCta?: ActionCta;
 }
-
-interface AiResponsePayload {
-  text: string;
-  actionCta?: {
-    title: string;
-    icon?: keyof typeof Feather.glyphMap;
-    prompt: string;
-  };
-}
-
-const getAiResponse = (prompt: string): AiResponsePayload => {
-  const lower = prompt.toLowerCase().trim();
-  if (lower === 'hello' || lower === 'hi' || lower === 'hey' || lower.startsWith('hello') || lower.startsWith('hey')) {
-    return {
-      text: "Hey! Ready to accelerate your growth pipeline. What campaign or accounts should we focus on today?",
-      actionCta: {
-        title: 'Discover leads',
-        icon: 'search',
-        prompt: 'Find high-intent B2B accounts hiring for Growth & RevOps with recent Series A/B funding, and generate personalized outbound angles.',
-      },
-    };
-  }
-  if (lower.startsWith('enrich these 14 accounts') || lower.startsWith('enrich these accounts')) {
-    return {
-      text: "Enriched contacts and generated tailored 3-touch sequences for Acme AI, Vektor Data, and Northstar Cloud!\n\n• Verified Work Emails: 100% deliverable via ZeroBounce.\n• First Email Hook: Signal-aligned trigger based on their Q4 job postings.\n• Multi-touch schedule: Email + LinkedIn Connection nudge spaced 3 business days.\n\nEverything is staged in your Outbound Sequences queue.",
-      actionCta: {
-        title: 'Approve & launch sequences',
-        icon: 'zap',
-        prompt: 'Approve and queue all 3 draft sequences for sending',
-      },
-    };
-  }
-  if (lower.startsWith('approve and queue')) {
-    return {
-      text: "Campaign approved!\n\nAll 3 cold outreach sequences are scheduled in the sending pipeline.\n• Warmup stagger: 25 emails / day / domain.\n• Target time: 8:45 AM local recipient time.\n• Tracking: Real-time reply tracking and sentiment classification enabled.",
-    };
-  }
-  if (lower.includes('lead') || lower.includes('discover') || lower.includes('intent') || lower.includes('acme') || lower.includes('vektor') || lower.includes('prospect')) {
-    return {
-      text: "Identified 14 high-intent B2B accounts matching your ICP (Series A/B, active RevOps/Growth hiring):\n\n1. Acme AI (Series B · $24M)\n   • Trigger: 4 new SDR openings posted 2 days ago.\n   • Outbound Angle: Accelerating rep ramp time with automated account research.\n   • Primary Contact: David Chen (Head of Sales Development).\n\n2. Vektor Data (Series A · $9M)\n   • Trigger: Migrating CRM stack to Salesforce.\n   • Outbound Angle: Zero-leakage pipeline syncing and real-time lead enrichment.\n   • Primary Contact: Sarah Jenkins (VP Growth).\n\n3. Northstar Cloud (Growth Stage)\n   • Trigger: 3x web traffic spike on comparison pages.\n   • Outbound Angle: Deanonymizing high-intent accounts with instant outbound.\n\nWould you like me to enrich these contacts and draft tailored initial outreach sequences?",
-      actionCta: {
-        title: 'Enrich & draft outreach',
-        icon: 'plus-circle',
-        prompt: 'Enrich these 14 accounts and generate initial outreach sequences',
-      },
-    };
-  }
-  if (lower.includes('draft') || lower.includes('outbound') || lower.includes('email') || lower.includes('sequence') || lower.includes('sarah') || lower.includes('marcus') || lower.includes('elena')) {
-    return {
-      text: "Here is the audit for your 3 pending cold outreach drafts:\n\n1. Sarah Lin (VP Growth @ ScaleCorp)\n   • Personalization Score: 96%\n   • Hook: Congratulated on their recent SOC-2 compliance milestone.\n   • CTA: 15-minute workflow audit on AI outbound enrichment.\n\n2. Marcus Vance (Head of RevOps @ DataSphere)\n   • Personalization Score: 92%\n   • Hook: Referenced their podcast discussion on tool consolidation.\n   • CTA: 2-minute interactive demo link.\n\n3. Elena Rostova (VP Sales @ Synthetix)\n   • Personalization Score: 89%\n   • Hook: Addressed their recent European expansion announcement.\n   • CTA: Benchmark report on outbound deliverability across EMEA.\n\nAll deliverability checks passed (DKIM/SPF verified, 0% spam risk). Ready to approve and queue for sending?",
-      actionCta: {
-        title: 'Approve & queue campaign',
-        icon: 'check-circle',
-        prompt: 'Approve and queue all 3 draft sequences for sending',
-      },
-    };
-  }
-  if (lower.includes('visibility') || lower.includes('perplexity') || lower.includes('search') || lower.includes('geo') || lower.includes('citation') || lower.includes('metric')) {
-    return {
-      text: "AI Search Visibility & GEO Benchmark (Last 7 Days):\n\n• Perplexity AI: Ranked #1 for 'best AI growth tools' and 'automated outbound platforms' (82% citation frequency).\n• ChatGPT Search: Featured in top 3 recommended solutions for B2B pipeline generation (+24% MoM citation presence).\n• Claude: Cited 18 times as the leading companion for growth operators.\n\nKey Win: Our programmatic comparison guides now drive 43% of generative search referral traffic.\n\nRecommendation: Publish our new case studies to capture rising search queries around 'autonomous SDR workflows'.",
-      actionCta: {
-        title: 'Generate comparison guide',
-        icon: 'file-text',
-        prompt: 'Draft programmatic comparison guide for autonomous SDR agents',
-      },
-    };
-  }
-  if (lower.includes('campaign') || lower.includes('launch') || lower.includes('briefing') || lower.includes('q4') || lower.includes('calendar') || lower.includes('sync')) {
-    return {
-      text: "Executive Briefing prepared for the 2:30 PM Q4 Outbound Launch Review:\n\n1. Target Audience: 450 verified Tier-1 accounts across North America & EMEA.\n2. Segment Performance Test:\n   • Variant A (Pain-point specific): Projected 8.4% reply rate.\n   • Variant B (Signal-triggered hiring hook): Projected 12.1% reply rate.\n3. Domain Health: 12 secondary sending domains verified, inbox warmup optimal.\n4. Expected Pipeline: $320k - $480k qualified pipeline within 30 days.\n\nAll sequence variants and the approval queue are synchronized. Would you like me to open the review items?",
-      actionCta: {
-        title: 'Open approval queue',
-        icon: 'arrow-right',
-        prompt: 'Open campaign approvals and final checklist',
-      },
-    };
-  }
-  if (lower.includes('latency') || lower.includes('edge')) {
-    return {
-      text: "Looking at global edge metrics across APAC, EMEA, and LATAM:\n\n1. APAC (Tokyo, Singapore): P95 edge latency is at 42ms with an 89.4% cache hit ratio.\n2. EMEA (Frankfurt, London): P95 is 28ms, optimal Anycast routing.\n3. LATAM (São Paulo): Seeing a 78ms spike due to cross-border peering.\n\nRecommendation: Deploy edge warmers in São Paulo and configure geo-DNS failover to cut LATAM latency by ~34%.",
-    };
-  }
-  return {
-    text: `I have analyzed your request regarding "${prompt}". All pipeline models, enriched accounts, and campaign signals look optimal. Let me know what specific step you'd like to take next!`,
-    actionCta: {
-      title: 'Run pipeline diagnostic',
-      icon: 'activity',
-      prompt: 'Run deep diagnostic on pipeline conversion rates',
-    },
-  };
-};
 
 export const HomeScreen: React.FC = () => {
   const colorScheme = useColorScheme();
@@ -182,32 +91,38 @@ export const HomeScreen: React.FC = () => {
     }
   };
 
-  const handleSend = (overrideText?: string) => {
+  const handleSend = async (overrideText?: string) => {
     const textToSend = typeof overrideText === 'string' ? overrideText : inputText;
     const trimmed = textToSend.trim();
     if (!trimmed || isGenerating) return;
 
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text: trimmed };
-    setMessages((prev) => [...prev, userMsg]);
+    const assistantId = (Date.now() + 1).toString();
+
+    // Snapshot chat history for Gemini conversational context
+    const currentHistory: ChatHistoryMessage[] = messages.map((m) => ({
+      role: m.role,
+      text: m.text,
+    }));
+
+    // Add user message and assistant placeholder with thinking state
+    setMessages((prev) => [
+      ...prev,
+      userMsg,
+      {
+        id: assistantId,
+        role: 'assistant',
+        text: '',
+        isStreaming: true,
+      },
+    ]);
     setInputText('');
+    setIsGenerating(true);
     Keyboard.dismiss();
 
-    const responsePayload = getAiResponse(trimmed);
-    const words = responsePayload.text.split(' ');
-    const assistantId = (Date.now() + 1).toString();
-    setIsGenerating(true);
-
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: assistantId,
-          role: 'assistant',
-          text: '',
-          isStreaming: true,
-          actionCta: responsePayload.actionCta,
-        },
-      ]);
+    try {
+      const responsePayload = await generateGeminiResponse(trimmed, currentHistory);
+      const words = responsePayload.text.split(' ');
 
       let currentIndex = 0;
       let currentAcc = '';
@@ -226,13 +141,29 @@ export const HomeScreen: React.FC = () => {
           clearInterval(interval);
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === assistantId ? { ...m, isStreaming: false } : m
+              m.id === assistantId
+                ? { ...m, isStreaming: false, actionCta: responsePayload.actionCta }
+                : m
             )
           );
           setIsGenerating(false);
         }
-      }, 35);
-    }, 280);
+      }, 25);
+    } catch (err) {
+      console.warn('[Chat] Failed to generate response:', err);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? {
+                ...m,
+                text: "I couldn't process that request right now. Please check your internet connection or Gemini API key.",
+                isStreaming: false,
+              }
+            : m
+        )
+      );
+      setIsGenerating(false);
+    }
   };
 
   const handleSelectPrompt = (promptText: string) => {
@@ -316,28 +247,61 @@ export const HomeScreen: React.FC = () => {
                   if (item.role === 'user') {
                     return (
                       <View key={item.id} style={styles.userMessageRow}>
-                        <RetroUserBubble text={item.text} />
+                        <View
+                          style={[
+                            styles.userBubble,
+                            isDark ? styles.userBubbleDark : styles.userBubbleLight,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.userText,
+                              { color: isDark ? '#F8FAFC' : '#0F172A' },
+                            ]}
+                          >
+                            {item.text}
+                          </Text>
+                        </View>
                       </View>
                     );
                   }
 
                   return (
                     <View key={item.id} style={styles.assistantMessageRow}>
-                      <Text
-                        style={[
-                          styles.assistantText,
-                          { color: isDark ? '#F1F5F9' : '#0F172A' },
-                        ]}
-                      >
-                        {item.text}
-                      </Text>
+                      {item.text.length === 0 && item.isStreaming ? (
+                        <View style={styles.thinkingContainer}>
+                          <View
+                            style={[
+                              styles.thinkingDot,
+                              { backgroundColor: isDark ? '#818CF8' : '#6366F1' },
+                            ]}
+                          />
+                          <Text
+                            style={[
+                              styles.thinkingText,
+                              { color: isDark ? '#94A3B8' : '#64748B' },
+                            ]}
+                          >
+                            Thinking...
+                          </Text>
+                        </View>
+                      ) : (
+                        <Text
+                          style={[
+                            styles.assistantText,
+                            { color: isDark ? '#F1F5F9' : '#0F172A' },
+                          ]}
+                        >
+                          {item.text}
+                        </Text>
+                      )}
 
                       {/* Action CTA Button with Luminous inner shadow style */}
                       {!item.isStreaming && item.actionCta && (
                         <View style={styles.assistantCtaWrapper}>
                           <LuminousButton
                             title={item.actionCta.title}
-                            icon={item.actionCta.icon}
+                            icon={item.actionCta.icon as keyof typeof Feather.glyphMap}
                             variant="compact"
                             onPress={() => handleSend(item.actionCta!.prompt)}
                           />
@@ -536,7 +500,7 @@ const styles = StyleSheet.create({
   userBubble: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: 16,
   },
   userBubbleLight: {
     backgroundColor: '#F2F2F7',
@@ -546,14 +510,29 @@ const styles = StyleSheet.create({
   },
   userText: {
     fontFamily: fonts.regular,
-    fontSize: 16,
+    fontSize: 15.5,
     lineHeight: 22,
-    fontWeight: '400',
     letterSpacing: -0.2,
   },
   assistantMessageRow: {
     alignSelf: 'flex-start',
     width: '100%',
+  },
+  thinkingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 6,
+  },
+  thinkingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  thinkingText: {
+    fontFamily: fonts.medium,
+    fontSize: 14,
+    letterSpacing: -0.2,
   },
   assistantText: {
     fontFamily: fonts.regular,

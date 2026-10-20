@@ -23,6 +23,18 @@ Jam Mobile Companion – AI Growth Assistant mobile app built with Expo SDK 58, 
 npm install
 ```
 
+### Environment Configuration (Gemini API)
+Create a `.env` file in the root directory (or copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+Add your Google Gemini API key:
+```env
+EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key_here
+EXPO_PUBLIC_GEMINI_MODEL=gemini-2.5-flash
+```
+> **Note**: If no API key is provided, the app will seamlessly fall back to realistic demo data so you can test all workflows offline.
+
 ### Running the App
 ```bash
 npx expo start
