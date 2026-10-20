@@ -17,6 +17,7 @@ import { fonts } from '../theme/typography';
 import { ChatInputBox } from '../components/ChatInputBox';
 import { PromptChip, PromptChipItem } from '../components/PromptChip';
 import { LuminousButton } from '../components/LuminousButton';
+import { RetroUserBubble } from '../components/RetroUserBubble';
 import { SidebarDrawer } from '../components/SidebarDrawer';
 
 const PROMPT_CHIPS: PromptChipItem[] = [
@@ -315,21 +316,7 @@ export const HomeScreen: React.FC = () => {
                   if (item.role === 'user') {
                     return (
                       <View key={item.id} style={styles.userMessageRow}>
-                        <View
-                          style={[
-                            styles.userBubble,
-                            isDark ? styles.userBubbleDark : styles.userBubbleLight,
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              styles.userText,
-                              { color: isDark ? '#F8FAFC' : '#0F172A' },
-                            ]}
-                          >
-                            {item.text}
-                          </Text>
-                        </View>
+                        <RetroUserBubble text={item.text} />
                       </View>
                     );
                   }
@@ -469,11 +456,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 10,
+    backgroundColor: 'transparent',
   },
   topRightIcons: {
     flexDirection: 'row',
@@ -483,9 +476,23 @@ const styles = StyleSheet.create({
   navButton: {
     width: 38,
     height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  navButtonLight: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+  },
+  navButtonDark: {
+    backgroundColor: '#1E2028',
+    borderColor: '#2D3139',
   },
   twoLineMenu: {
     width: 18,
@@ -509,13 +516,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 58,
     paddingBottom: 88,
     justifyContent: 'flex-start',
   },
   scrollContentEmpty: {
     justifyContent: 'flex-end',
     paddingBottom: 76,
+    paddingTop: 58,
   },
   messagesList: {
     paddingBottom: 12,
@@ -529,15 +537,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 20,
-    borderWidth: 1,
   },
   userBubbleLight: {
     backgroundColor: '#F2F2F7',
-    borderColor: '#E5E7EB',
   },
   userBubbleDark: {
     backgroundColor: '#1E2028',
-    borderColor: '#2D3139',
   },
   userText: {
     fontFamily: fonts.regular,
