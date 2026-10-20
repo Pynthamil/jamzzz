@@ -252,11 +252,8 @@ export const HomeScreen: React.FC = () => {
           <View style={styles.topBar}>
             {/* Left: Clean 2-Line Hamburger Menu */}
             <TouchableOpacity
-              style={[
-                styles.navButton,
-                isDark ? styles.navButtonDark : styles.navButtonLight,
-              ]}
-              activeOpacity={0.7}
+              style={styles.navButton}
+              activeOpacity={0.6}
               onPress={() => setIsSidebarOpen(true)}
               accessibilityLabel="Open menu"
               accessibilityRole="button"
@@ -281,18 +278,15 @@ export const HomeScreen: React.FC = () => {
 
             {/* Right: Single Clean New Chat Button */}
             <TouchableOpacity
-              style={[
-                styles.navButton,
-                isDark ? styles.navButtonDark : styles.navButtonLight,
-              ]}
-              activeOpacity={0.7}
+              style={styles.navButton}
+              activeOpacity={0.6}
               onPress={() => setMessages([])}
               accessibilityLabel="Start new chat"
               accessibilityRole="button"
             >
               <Feather
                 name="edit"
-                size={18}
+                size={20}
                 color={isDark ? '#F1F5F9' : '#1E293B'}
               />
             </TouchableOpacity>
@@ -489,15 +483,9 @@ const styles = StyleSheet.create({
   navButton: {
     width: 38,
     height: 38,
-    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  navButtonDark: {
-    backgroundColor: '#1E2028',
-  },
-  navButtonLight: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: 'transparent',
   },
   twoLineMenu: {
     width: 18,
